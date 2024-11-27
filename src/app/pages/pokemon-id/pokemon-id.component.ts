@@ -6,11 +6,12 @@ import {CommonModule} from '@angular/common';
 import {FlavorTextEntry} from '../../data/interfaces/pokemon';
 import {TranslationService} from '../../data/services/translation.service';
 import {NavbarComponent} from "../../component/navbar/navbar.component";
+import {FooterComponent} from '../../component/footer/footer.component';
 
 @Component({
   selector: 'app-pokemon-id',
   standalone: true,
-    imports: [CommonModule, NavbarComponent, RouterOutlet],
+  imports: [CommonModule, NavbarComponent, RouterOutlet, FooterComponent],
   templateUrl: './pokemon-id.component.html',
   styleUrls: ['./pokemon-id.component.scss']
 })
@@ -21,7 +22,6 @@ export class PokemonIdComponent implements OnInit {
   translations: any = {};
 
   constructor(private translationService: TranslationService) {}
-
   private updateTranslations(): void {
     this.translationService.getTranslation('height').subscribe(translation => {
       this.translations.height = translation;
@@ -39,7 +39,6 @@ export class PokemonIdComponent implements OnInit {
       this.translations.abilities = translation;
     });
   }
-
   ngOnInit(): void {
     this.translationService.currentLang$.subscribe(() => {
       this.updateTranslations();
@@ -48,7 +47,6 @@ export class PokemonIdComponent implements OnInit {
     if (pokemonName) {
       // Делаем запрос, используя имя покемона
       this.pokemonService.getPokemon(pokemonName).subscribe((data) => {
-        console.log(data)
         this.pokemonService.getPokemonSpecies(pokemonName).subscribe(
           species => {
             const description = species.flavor_text_entries.find((entry: FlavorTextEntry) => entry.language.name === 'en')?.flavor_text || 'No description available';
@@ -67,7 +65,7 @@ export class PokemonIdComponent implements OnInit {
               abilities: data.abilities.map((ability: any) => ability.ability.name)
             };
 
-            console.log(this.pokemon.stats)
+            // console.log(this.pokemon)
           },
           error => console.error('Error fetching species details:', error)
         );
