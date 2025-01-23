@@ -1,79 +1,75 @@
-<app-navbar></app-navbar>
-<div class="container">
-  <header class="header">
-    <img src="assets/images/logo.png" alt="Pokemon Logo" class="logo">
-  </header>
-  <div class="search-container">
-    <input type="text" [(ngModel)]="searchTerm" [placeholder]="translations.search" class="search-input"
-           (keyup.enter)="onSearch()">
-    <button class="search-button" (click)="onSearch()">
-      <img src="assets/images/search.png" alt="Search">
-    </button>
-  </div>
-  <div class="pokemon-grid">
-    <div *ngFor="let pokemon of pokemons" class="pokemon-card">
-      <div class="texts">
-        <div class="type-tags">
-          <span *ngFor="let type of pokemon.types" class="type {{ type }}">{{ type | titlecase }}</span>
+<div *ngIf="loading">
+  <app-navbar></app-navbar>
+  <div class="container">
+    <header class="header">
+      <img src="assets/images/logo.png" alt="Pokemon Logo" class="logo">
+    </header>
+    <div class="search-container">
+      <input type="text" [(ngModel)]="searchTerm" [placeholder]="translations.search" class="search-input"
+             (keyup.enter)="onSearch()">
+      <button class="search-button" (click)="onSearch()">
+        <mat-icon>search</mat-icon>
+      </button>
+      <button *ngIf="isAdmin" class="add-item" (click)="openAddDialog()">
+        <mat-icon>add</mat-icon>
+      </button>
+
+    </div>
+    <div class="pokemon-grid">
+      <div *ngFor="let pokemon of pokemons" class="pokemon-card">
+        <div class="texts">
+          <div class="type-tags">
+            <span *ngFor="let type of pokemon.types" class="type {{ type }}">{{ type | titlecase }}</span>
+          </div>
+          <h2 class="pokemon-name">{{pokemon.name | titlecase}}</h2>
+          <p class="pokemon-description">{{ pokemon.description }}</p>
+          <div class="buttons">
+            <a [routerLink]="['/pokemon', pokemon._id]">
+              <button mat-icon-button>
+                <mat-icon>visibility</mat-icon>
+              </button>
+            </a>
+            <button *ngIf="isAdmin" mat-icon-button (click)="openEditDialog(pokemon)">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button *ngIf="isAdmin" mat-icon-button color="warn" (click)="deletePokemon(pokemon)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+
         </div>
-        <h2 class="pokemon-name">{{pokemon.name | titlecase}}</h2>
-        <p class="pokemon-description">{{ pokemon.description }}</p>
-        <a [routerLink]="['/pokemon', pokemon.name]" class="know-more">{{translations.knowMore}}</a>
+        <div>
+          <span class="pokemon-id">{{ pokemon.id | leadingZeros }}</span>
+          <img [src]="pokemon.image" [alt]="pokemon.name"  loading="lazy"  class="pokemon-image">
+        </div>
       </div>
-      <div>
-        <span class="pokemon-id">{{ pokemon.id | leadingZeros }}</span>
-        <img [src]="pokemon.image" [alt]="pokemon.name" class="pokemon-image">
+    </div>
+    <div class="custom-pagination">
+      <div class="custom-pagination-content">
+        <div class="pagination">
+          <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">
+            <<
+          </button>
+          <span *ngFor="let page of [].constructor(totalPages); let i = index">
+      <button
+        [class.active]="i + 1 === currentPage"
+        (click)="goToPage(i + 1)"
+      >
+        {{ i + 1 }}
+      </button>
+    </span>
+          <button
+            (click)="goToPage(currentPage + 1)"
+            [disabled]="currentPage === totalPages"
+          >
+            >>
+          </button>
+        </div>
+
       </div>
     </div>
   </div>
-  <div class="custom-pagination">
-    <div class="custom-pagination-content">
-      <!-- Кнопки First и Back -->
-      <button
-        (click)="goToFirstPage()"
-        [disabled]="pageIndex === 0"
-        class="first-button">
-        << First</button>
-      <button
-        (click)="goToPreviousPage()"
-        [disabled]="pageIndex === 0"
-        class="back-button">
-        < Back</button>
-
-      <button
-        *ngFor="let page of pages"
-        (click)="goToPage(page)"
-        [class.active]="page === pageIndex + 1"
-        class="page-button"
-      >
-        {{ page }}
-      </button>
-
-      <button
-        (click)="goToNextPage()"
-        [disabled]="pageIndex === totalPages - 1"
-        class="next-button"
-      >
-        Next >
-      </button>
-      <button
-        (click)="goToLastPage()"
-        [disabled]="pageIndex === totalPages - 1"
-        class="last-button"
-      >
-        Last >>
-      </button>
-
-      <select
-        (change)="onPageSizeChange($event)"
-        class="page-size-select"
-      >
-        <option *ngFor="let size of pageSizeOptions" [value]="size" [selected]="size === pageSize">
-          {{ size }}
-        </option>
-      </select>
-    </div>
-  </div>
-
+  <app-footer></app-footer>
 </div>
+<div *ngIf="!loading" class="loading">loading...</div>
 
